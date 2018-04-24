@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<!-- This code is for demonstration purposes only.  You should not hotlink to Github, Rawgit, or files from the Cytoscape.js documentation in your production apps. -->
+<html>
+
+<head>
+    <!-- <link href="style.css" rel="stylesheet" /> -->
+    <meta charset=utf-8 />
+    <title>Visual style</title>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.1/dagre-d3.min.js"></script>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src='state-machine.min.js'></script>
+    <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.inputmask.bundle.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
+        crossorigin="anonymous">
+    <style id="css">
+        body {
+            font: 300 14px 'Helvetica Neue', Helvetica;
+            height: 1000px;
+            width: 1200px
+        }
+
+        /* .node rect {
+            stroke: #333;
+            fill: #fff;
+        } */
+
+        .normal {
+            font-weight: 100;
+            stroke: #333;
+            fill: #fff;
+        }
+
+        .edgePath path {
+            stroke: #333;
+            fill: #333;
+            stroke-width: 1.5px;
+        }
+
+        svg {
+            height: 100%;
+            width: 100%
+        }
+
+        /* Include the padding and border in an element's total width and height */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Remove margins and padding from the list */
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        /* Style the list items */
+
+        ul li {
+            width: 100%;
+            cursor: pointer;
+            position: relative;
+            padding: 12px 8px 12px 40px;
+            background: #eee;
+            font-size: 18px;
+            transition: 0.2s;
+
+            /* make the list items unselectable */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Set all odd list items to a different color (zebra-stripes) */
+
+        ul li:nth-child(odd) {
+            background: #f9f9f9;
+        }
+
+        /* Darker background-color on hover */
+
+        ul li:hover {
+            background: #ddd;
+        }
+
+        /* When clicked on, add a background color and strike out text */
+
+        ul li.checked {
+            background: #888;
+            color: #fff;
+            text-decoration: line-through;
+        }
+
+        /* Add a "checked" mark when clicked on */
+
+        ul li.checked::before {
+            content: '';
+            position: absolute;
+            border-color: #fff;
+            border-style: solid;
+            border-width: 0 2px 2px 0;
+            top: 10px;
+            left: 16px;
+            transform: rotate(45deg);
+            height: 15px;
+            width: 7px;
+        }
+
+        /* Style the close button */
+
+        .close {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 12px 16px 12px 16px;
+        }
+
+        .close:hover {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Style the header */
+
+        .header {
+            width: 100%;
+            background-color: #d9d9d9;
+            padding: 10px 20px;
+            color: white;
+            text-align: center;
+        }
+
+        /* Clear floats after the header */
+
+        .header:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Style the input */
+
+        input {
+            border: none;
+            /* width: 75%; */
+            padding: 10px;
+            /* float: left; */
+            font-size: 16px;
+        }
+
+        /* Style the "Add" button */
+
+        .addBtn {
+            padding: 10px;
+            width: 25%;
+            background: #d9d9d9;
+            color: #555;
+            float: left;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .addBtn:hover {
+            background-color: #bbb;
+        }
+
+        .accept {
+            stroke: #333;
+            fill: rgb(46, 204, 113);
+        }
+
+        .pending {
+            stroke: #333;
+            fill: rgb(231, 76, 60);
+        }
+
+        #streamUL {
+            /* white-space:nowrap; */
+        }
+
+        #streamUL li {
+            /* display:inline-block; */
+            width: 40px;
+            height: 40px;
+            padding: 0.5em 1em;
+        }
+    </style>
+</head>
+
+<body style="height: 700px;">
+    <div class="container">
+        <div id="ggraph" class="row">
+            <div class="col-sm-10" style="height: 110%;display: inline-block; vertical-align:top; height: 90%; border: solid">
+                    <h1>Pushdown automata diagram</h1>
+                    <svg width=960 height=600>
+                        <g/>
+                    </svg>
+            </div>
+            <div class="col-sm-2">
+                <div id="streamDIV" class="">
+                    <h2>Stream</h2>
+                    <input type="text" size="1" maxlength="1" id="stramVal" placeholder="S..">
+                    <ul id="streamUL">
+                    </ul>
+
+                    <!-- &#8594 -->
+                    <!-- <span onclick="newRule()" class="addBtn">Add</span> -->
+                    <button id="startStream" class="addBtn .btn" style="width: 70px">Start stream</button>
+                </div>
+                <div class="row" style="padding-top: 100px">
+                    <ul id="historyStack">
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div style="display: inline;">
+                    <div style="display: inline;">
+                        <div style="display: inline-block; vertical-align:top;">
+                            <div id="varDIV" class="header">
+                                <h2>Variables</h2>
+                                <input maxlength="1" size="1" type="text" id="varInput" placeholder="S, M...">
+                                <!-- <span onclick="newVar()" class="addBtn">Add</span> -->
+                            </div>
+
+                            <ul id="varsUL" class="rules">
+                            </ul>
+                        </div>
+                        <div style="display: inline-block; vertical-align:top;">
+                            <div id="strDIV" class="header">
+                                <h2>Strings</h2>
+                                <input maxlength="1" size="1" type="text" id="strInput" placeholder="0, 1...">
+                                <!-- <span onclick="newStr()" class="addBtn">Add</span> -->
+                            </div>
+
+                            <ul id="strsUL">
+                            </ul>
+                        </div>
+                        <div style="display: inline-block; vertical-align:top;">
+                            <div id="ruleDIV" class="header">
+                                <h2>Rules</h2>
+                                <input type="text" size="1" maxlength="1" id="ruleVarInput" placeholder="S..">
+                                <input type="text" id="ruleInput" placeholder="0S1 1S0 .">
+                                <!-- &#8594 -->
+                                <!-- <span onclick="newRule()" class="addBtn">Add</span> -->
+                            </div>
+
+                            <ul id="rulesUL">
+                            </ul>
+                        </div>
+                        <button onclick="draw()" class="addBtn">DRAW!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <input type="text" id="stringInput" placeholder="Input"> -->
+    <div style="display: inline-block; vertical-align:top;">
+
+    </div>
+    <script src="./PDA.js" id="js"></script>
+    <script src="./solver.js" id="js"></script>
+    <script src="demo.js"></script>
+</body>
+
+</html>

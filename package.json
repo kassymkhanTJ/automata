@@ -1,0 +1,9 @@
+{
+    "name": "automato",
+    "scripts": {
+      "start": "serve"
+    },
+    "dependencies": {
+      "serve": "latest"
+    }
+  }
