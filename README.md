@@ -1,1 +1,1 @@
-# kassymkhan.github.io
+# https://kassymkhantj.github.io/automata/
